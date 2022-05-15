@@ -1,0 +1,53 @@
+plugins {
+    id "java-library"
+    id "maven-publish"
+    id 'org.springframework.boot' version '2.6.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+}
+
+group 'my.great.app'
+version '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation "org.springframework.boot:spring-boot-starter-web"
+
+    compileOnly 'org.projectlombok:lombok'
+
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.springframework.boot:spring-boot-autoconfigure-processor'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+}
+
+bootJar.enabled(false)
+jar.enabled(true)
+
+//publishing {
+//    publications {
+//        maven(MavenPublication) {
+//            groupId = project.group
+//            artifactId = project.name
+//            version = project.version
+//            from components.java
+//        }
+//    }
+//    def publishUrl = System.getenv('NEXUS_LIB_LOAD')
+//    repositories {
+//        if (publishUrl) {
+//            maven {
+//                url publishUrl
+//                credentials {
+//                    username "$mavenProxyUser"
+//                    password "$mavenProxyPassword"
+//                }
+//            }
+//        } else {
+//            mavenLocal()
+//        }
+//    }
+//}
