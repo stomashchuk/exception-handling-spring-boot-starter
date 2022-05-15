@@ -56,8 +56,6 @@ public class CustomExceptionHandler {
     }
 
     private Throwable determineException(Exception e) {
-        // Для того, чтобы не нарушать абстракцию, бизнес исключение бросается последним,
-        // нас больше интересует тип его cause
         if (e instanceof BusinessException) {
             return e.getCause() == null
                 ? e
@@ -68,12 +66,12 @@ public class CustomExceptionHandler {
     }
 
     private HttpStatus determineResponseStatus(Class<? extends Throwable> thrownExceptionClass, Exception e) {
-        // Метод смотрит, есть ли в мапе значение с таким ключом и если есть, то возвращает его, если нет,
-        // то вычисляет значение с помощью переданной функции и добавляет его в мапу. При следующем обращении
-        // с таким же ключом, ключ уже будет в мапе
+        // 'computeIfAbsent' method looks if there is a value exist in the map with such key.
+        // If it exists then returns it. Else computes value with received function and puts it in the map.
+        // When the next call will occur this key will have already been in the map.
         return httpStatusMap.computeIfAbsent(thrownExceptionClass, ignored -> {
             for (Entry<Class<? extends Throwable>, HttpStatus> entry : httpStatusMap.entrySet()) {
-                // If thrown exception is a child object of a key from map (see method documentation)
+                // If thrown exception is a child object of a key from map (look at 'isInstance' method documentation)
                 if (entry.getKey().isInstance(e)) {
                     return entry.getValue();
                 }
@@ -112,10 +110,10 @@ public class CustomExceptionHandler {
 
     @SuppressWarnings("unchecked")
     private Map<Class<? extends Throwable>, HttpStatus> constructHttpStatusMap() {
-        // Так как типы Class сравниваются по ссылке, используется IdentityHashMap
+        // Using IdentityHashMap because classes are comparing by link
         Map<Class<? extends Throwable>, HttpStatus> result = new IdentityHashMap<>();
         result.put(ValidationException.class, HttpStatus.BAD_REQUEST);
-        // Если в пропертях клиентского приложения есть дополнительные значения, то добавляем их
+        // If properties in a client project contains additional values, then add them
         Map<String, Integer> statusMapFromProps =
             properties == null
                 ? null
@@ -137,10 +135,10 @@ public class CustomExceptionHandler {
 
     @SuppressWarnings("unchecked")
     private Collection<Class<? extends Throwable>> constructExceptionWithMessageForwardingSet() {
-        // Так как типы Class сравниваются по ссылке, используется IdentityHashMap
+        // Using IdentityHashMap because classes are comparing by link
         Set<Class<? extends Throwable>> result = Collections.newSetFromMap(new IdentityHashMap<>());
         result.add(ValidationException.class);
-        // Если в пропертях клиентского приложения есть дополнительные значения, то добавляем их
+        // If properties in a client project contains additional values, then add them
         Set<String> exceptionClassNames =
             properties == null
                 ? null
